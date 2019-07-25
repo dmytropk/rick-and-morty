@@ -19,8 +19,11 @@ var rickmortyRepo = (function() {
     } /* feth and data_____________________________________*/
 
     function addListItem(character) {
-        var $rickmortyLi = $('<li>');
-        var $rickmortyButton = $('<button class = "button-style">' + character.name + '</button>');
+        var $rickmortyLi = $('<li class="list-group-item"></li>');
+        var $rickmortyButton = $(
+            '<button type="button" class="btn btn-block btn-outline-* pop-button" data-toggle="modal" data-target="#pop-modal">'
+            + character.name + '</button>'
+        );
         $rickmortyButton.on('click', function() {
             showDetails(character);
         });
@@ -28,16 +31,10 @@ var rickmortyRepo = (function() {
         $rickmortyLi.append($rickmortyButton);
     } /* buttons within ul_______________________________ */
 
-    function showDetails(item) {
-        rickmortyRepo.loadDetails(item).then(function () {
-            showModal(item);
-        });
-    }   /* Click and log! */
-
     function add(item) {
         repository.push(item);
     }
-    
+
     function getAll() {
         return repository;
     }
@@ -47,69 +44,34 @@ var rickmortyRepo = (function() {
         return $.ajax(url)
             .then (function(response) {
                 item.imageUrl = response.image;
-                item.status = response.status;
                 item.species = response.species;
             }).catch(function(e) {
                 console.error(e);
             });
     } /* features of the item_________________*/
 
-    function showModal(item) {
-        var $modalContainer = $('#modal-container');
-        $modalContainer.text('');
+    function showDetails(item) {
+        $(document).on('click', '.pop-button', function() {
 
-        var $modal = $('<div class = "modal">');
+            var $nameElement = $('<h4>' + item.name + '</h4>');
 
-        var $closeButtonElement = $('<button class = "modal-close"> close </button>');
-        $closeButtonElement.on('click', hideModal);
+            var $imageElement = $('<img>');
+            $imageElement.attr('src', item.imageUrl);
 
-        var $nameElement = $('<h1>' + item.name + '</h1>');
+            var $speciesElement = $('<p>' + item.species + '</p>');
 
-        var $imageElement = $('<img class = "modal-img">');
-        $imageElement.attr('src', item.imageUrl);
-
-        var $statusElement = $('<p>' + item.status + '</p>');
-
-        var $speciesElement = $('<p>' + item.species + '</p>');
-
-        $modal.append($closeButtonElement);
-        $modal.append($nameElement);
-        $modal.append($imageElement);
-        $modal.append($statusElement);
-        $modal.append($speciesElement);
-        $modalContainer.append($modal);
-
-        $modalContainer.addClass('is-visible');
+            $('#character-name').html($nameElement);
+            $('#image-element').html($imageElement);
+            $('#species-element').html($speciesElement);
+        });
     }  /* show modal container______________________ */
-
-    function hideModal() {
-    var $modalContainer = $('#modal-container');
-    $modalContainer.removeClass('is-visible');
-    }
-
-    window.addEventListener('keydown', e => {
-        var $modalContainer = $('#modal-container');
-        if (e.key === 'Escape' && $modalContainer.hasClass('is-visible')) {
-        hideModal();
-        }
-    });
-
-    var $modalContainer = $('#modal-container');
-    $modalContainer.on('click', function(event) {
-        if ($(event.target).closest('#modal-container').length) {
-        hideModal();
-        }
-    });
 
     return {
         add: add,
         getAll: getAll,
         addListItem: addListItem,
-        showDetails: showDetails,
         loadList: loadList,
-        loadDetails:loadDetails,
-        showModal: showModal,
-        hideModal: hideModal
+        loadDetails:loadDetails
     };
 })(); /* IIFE ends here */
 
@@ -118,5 +80,6 @@ var getAllCharacters = rickmortyRepo.getAll();
 rickmortyRepo.loadList().then(function() {
     getAllCharacters.forEach(function (character){
         rickmortyRepo.addListItem (character);
+        rickmortyRepo.loadDetails (character);
     });
-}); /* Catch them all! */
+});
