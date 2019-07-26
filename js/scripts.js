@@ -52,13 +52,11 @@ var rickmortyRepo = (function() {
 
     function showDetails(item) {
         $(document).on('click', '.pop-button', function() {
-
             var $nameElement = $('<h4>' + item.name + '</h4>');
-
             var $imageElement = $('<img>');
-            $imageElement.attr('src', item.imageUrl);
-
             var $speciesElement = $('<p>' + item.species + '</p>');
+
+            $imageElement.attr('src', item.imageUrl);
 
             $('#character-name').html($nameElement);
             $('#image-element').html($imageElement);
